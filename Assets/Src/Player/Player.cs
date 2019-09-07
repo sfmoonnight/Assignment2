@@ -11,6 +11,8 @@ public class Player : MonoBehaviour {
 	private int moveCount = 0;
 	private CharacterController cc;
 
+    private GameManager gameManager;
+
     enum State {
         Idle,
         Moving,
@@ -18,11 +20,24 @@ public class Player : MonoBehaviour {
     }
 
     private State currentState = State.Idle;
+    private static Player _instance;
 
-	// Use this for initialization
-	void Start() {
+    public static Player GetPlayer()
+    {
+        if (Player._instance == null)
+        {
+            return null;
+        }
+        return Player._instance;
+    }
+
+    // Use this for initialization
+    void Start() {
 		cc = this.GetComponent<CharacterController>();
-	}
+        _instance = this;
+        gameManager = GameManager.GetGameManager();
+        gameManager.player = gameObject;
+    }
 
 	// Update is called once per frame
 	void Update() {
@@ -58,6 +73,7 @@ public class Player : MonoBehaviour {
 			this.currentState = State.Moving;
 			this.velocity = this.initialVelocity;
 			this.moveCount++;
+            gameManager.CountMove();
 		}
 	}
 
@@ -81,6 +97,11 @@ public class Player : MonoBehaviour {
 			//hit.gameObject.GetComponent<PlayerInteractable>()?.OnHit(hit, this);
 			PlayerInteractable pi = hit.gameObject.GetComponent<PlayerInteractable>();
 			if (pi) {
+                if(pi.GetType() == typeof(Killing))
+                {
+                    gameManager.CountDeath();
+                    gameManager.RespawnPlayer();
+                }
 				pi.OnHit(hit, this);
 			}
 		}
@@ -96,10 +117,18 @@ public class Player : MonoBehaviour {
 
 	public void HasWon () {
 		this.currentState = State.Won;
+        gameManager.LoadNextLevel();
 	}
 
-	public int AccumulateScore (int scoreAdd) {
-		this.score += scoreAdd;
-		return this.score;
+	public void AccumulateScore (int scoreAdd) {
+        gameManager.AddScore(scoreAdd);	
 	}
+
+    /*private void OnDestroy()
+    {
+        print("still alive~");
+        gameManager.CountDeath();
+        gameManager.ReloadScene();
+        //gameManager.RespawnPlayer();
+    }*/
 }

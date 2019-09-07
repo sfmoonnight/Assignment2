@@ -8,7 +8,7 @@ public class Bouncing : PlayerInteractable {
 	public override void OnHit(ControllerColliderHit hit, Player player) {
 		player.transform.forward = Vector3.Reflect(player.transform.forward, hit.normal);
 		float velocity = player.GetVelocity();
-		velocity *= this.bounceFactor;
+        velocity *= this.bounceFactor;
 		player.SetVelocity(velocity);
 		this.bounceFactor -= this.bounceDecay;
 	}

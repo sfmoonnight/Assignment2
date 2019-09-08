@@ -1,9 +1,9 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
-[System.Serializable]
 public class GameManager : MonoBehaviour
 {
     private static GameManager _instance;
@@ -24,17 +24,21 @@ public class GameManager : MonoBehaviour
     public float startTime = 0;
     public float endTime = Mathf.Infinity;
     public int moves;
-    public int death;
+    public int deaths;
     public float score;
     public int currentSceneIndex;
+
+    private string path;
 
     // Start is called before the first frame update
     void Start()
     {
         moves = 0;
-        death = 0;
+        deaths = 0;
         score = 0;
         currentSceneIndex = SceneManager.GetActiveScene().buildIndex;
+
+        path = Application.dataPath + "/TopRecord.txt";
     }
 
     // Update is called once per frame
@@ -55,18 +59,22 @@ public class GameManager : MonoBehaviour
         }
     }*/
 
-    public void ReloadScene()
+    /*public void ReloadScene()
     {
         if(currentSceneIndex >= 0)
         {
             SceneManager.LoadScene(currentSceneIndex);
         }
-    }
+    }*/
 
     public void LoadNextLevel()
     {
         if (currentSceneIndex >= 0)
         {
+            if(currentSceneIndex == 4)
+            {
+                SetEndTime();
+            }
             currentSceneIndex += 1;
             SceneManager.LoadScene(currentSceneIndex);
         }
@@ -77,9 +85,18 @@ public class GameManager : MonoBehaviour
         Instantiate(player, new Vector3(0, 2, -8), Quaternion.identity);
     }
 
+    public void Restart()
+    {
+        SceneManager.LoadScene(0);
+        moves = 0;
+        deaths = 0;
+        score = 0;
+        currentSceneIndex = 0;
+    }
+
     public void CountDeath()
     {
-        death += 1;
+        deaths += 1;
     }
 
     public void CountMove()
@@ -102,5 +119,56 @@ public class GameManager : MonoBehaviour
         endTime = Time.time;
     }
 
-    
+    public float GetStartTime()
+    {
+        return startTime;
+    }
+
+    public float GetEndTime()
+    {
+        return endTime;
+    }
+
+    public float GetScore()
+    {
+        return score;
+    }
+
+    public float GetMoves()
+    {
+        return moves;
+    }
+
+    public float GetDeaths()
+    {
+        return deaths;
+    }
+
+    public float ReadRecord()
+    {
+        if (File.Exists(path))
+        {
+            StreamReader reader = new StreamReader(path);
+            //Debug.Log(reader.ReadLine());
+            float num = float.Parse(reader.ReadLine());
+            reader.Close();
+
+            //Debug.Log(num);
+            return num;
+        }
+        else
+        {
+            FileStream stream = new FileStream(path, FileMode.Create);
+            stream.Close();
+            WriteRecord(99999999);
+            return 99999999;
+        }     
+    }
+
+    public void WriteRecord(double newRecord)
+    {
+        StreamWriter writer = new StreamWriter(path, false);
+        writer.WriteLine(newRecord);
+        writer.Close();
+    }
 }

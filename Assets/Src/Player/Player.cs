@@ -6,9 +6,9 @@ public class Player : MonoBehaviour {
 	public float initialVelocity = 2f;
 	public float decay = 0.1f;
 
-	private int score = 0;
+	//private int score = 0;
 	private float velocity = 0;
-	private int moveCount = 0;
+	//private int moveCount = 0;
 	private CharacterController cc;
 
     private GameManager gameManager;
@@ -72,7 +72,7 @@ public class Player : MonoBehaviour {
 			// let's gooo
 			this.currentState = State.Moving;
 			this.velocity = this.initialVelocity;
-			this.moveCount++;
+			//this.moveCount++;
             gameManager.CountMove();
 		}
 	}
